@@ -1,4 +1,4 @@
-# tabsidebar-boost
+# Tabsidebar-Boost
 
 Make Vim-TabSideBar more useful! (see http://rbtnn.github.io/vim/ for Vim-TabSideBar patch)
 
