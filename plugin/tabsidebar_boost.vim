@@ -13,6 +13,13 @@ if !has('tabsidebar')
   finish
 endif
 
+if get(g:, 'tabsidebar_boost#auto_adjust_tabsidebarcolumns', 0)
+  augroup tabsidebar_boost
+    autocmd!
+    autocmd WinEnter,WinLeave,TabEnter,TabLeave,BufWinEnter,BufWinLeave,BufAdd,BufFilePost *
+    \       call tabsidebar_boost#adjust_columns()
+  augroup END
+endif
 
 nnoremap <silent> <Plug>(tabsidebar-boost-jump)            :<C-u>call tabsidebar_boost#jump()<CR>
 nnoremap <silent> <Plug>(tabsidebar-boost-next-window)     :<C-u>call tabsidebar_boost#next_window()<CR>
