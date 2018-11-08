@@ -2,6 +2,21 @@ scriptencoding utf-8
 let s:save_cpo = &cpo
 set cpo&vim
 
+function! s:get_chars(default) abort
+  if type(get(g:, 'tabsidebar_boost#chars')) !=# v:t_string
+    return a:default
+  endif
+  if stridx(g:tabsidebar_boost#chars, "\t") !=# -1
+    echohl ErrorMsg
+    echomsg 'tabsidebar-boost: g:tabsidebar_boost#chars cannot contain tab character.'
+    \       'using default value...'
+    echohl None
+    return a:default
+  endif
+  return g:tabsidebar_boost#chars
+endfunction
+
+let g:tabsidebar_boost#chars = s:get_chars('asdfghjklzxcvbnmqwertyuiop')
 let g:tabsidebar_boost#format_window = get(g:, 'tabsidebar_boost#format_window', 'tabsidebar_boost#format_window')
 let g:tabsidebar_boost#format_tabpage = get(g:, 'tabsidebar_boost#format_tabpage', 'tabsidebar_boost#format_tabpage')
 
@@ -24,7 +39,7 @@ function! tabsidebar_boost#tabsidebar(tabnr) abort
   if !has('tabsidebar')
     return ''
   endif
-  let wininfo = s:get_wininfo()
+  let wininfo = s:get_wininfo(g:tabsidebar_boost#chars)
   let winlines = map(tabpagebuflist(a:tabnr), {winidx,bufnr ->
   \ call(g:tabsidebar_boost#format_window, [
   \   s:find_window(wininfo, {'tabnr': a:tabnr, 'winnr': winidx + 1})
@@ -53,7 +68,7 @@ function! tabsidebar_boost#jump() abort
   if !has('tabsidebar')
     return
   endif
-  let wininfo = s:get_wininfo()
+  let wininfo = s:get_wininfo(g:tabsidebar_boost#chars)
   let wins = s:search_windows(wininfo, {})
   let buf = ''
   let s:is_jumping = 1
@@ -70,14 +85,14 @@ function! tabsidebar_boost#jump() abort
         break
       endif
       let buf .= c
-      if empty(filter(copy(wins), {_,w -> w.bufnr !=# buf && w.bufnr =~# '^' . buf }))
+      if empty(filter(copy(wins), {_,w -> w.id !=# buf && w.id =~# '^' . buf }))
         break
       endif
     endwhile
   finally
     let s:is_jumping = 0
   endtry
-  let win = get(filter(copy(wins), {_,w -> w.bufnr ==# buf }), 0, {})
+  let win = get(filter(copy(wins), {_,w -> w.id ==# buf }), 0, {})
   if empty(win)
     echohl WarningMsg
     echomsg 'no such window:' buf
@@ -88,18 +103,18 @@ function! tabsidebar_boost#jump() abort
 endfunction
 
 function! tabsidebar_boost#next_window() abort
-  return s:next_window(v:count1)
+  return s:next_window(v:count1, g:tabsidebar_boost#chars)
 endfunction
 
 function! tabsidebar_boost#previous_window() abort
-  return s:next_window(-v:count1)
+  return s:next_window(-v:count1, g:tabsidebar_boost#chars)
 endfunction
 
-function! s:next_window(n) abort
+function! s:next_window(n, chars) abort
   if !has('tabsidebar')
     return
   endif
-  let [wins, curidx] = s:get_windows_with_index()
+  let [wins, curidx] = s:get_windows_with_index(a:chars)
   if curidx ==# -1
     throw 'tabsidebar-boost: could not find current window'
   endif
@@ -107,8 +122,8 @@ function! s:next_window(n) abort
   call win_gotoid(win_getid(win.winnr, win.tabnr))
 endfunction
 
-function! s:get_windows_with_index() abort
-  let wininfo = s:get_wininfo()
+function! s:get_windows_with_index(chars) abort
+  let wininfo = s:get_wininfo(a:chars)
   let wins = s:search_windows(wininfo, {'order_by': function('s:by_tabnr_and_winnr')})
   let curidx = -1
   for i in range(len(wins))
@@ -136,14 +151,28 @@ function! s:getchar(...) abort
   return type(c) is# v:t_number ? nr2char(c) : c
 endfunction
 
-function! s:get_wininfo() abort
-  let wininfo = {}
+function! s:get_wininfo(chars) abort
+  let pairs = []
   for tabnr in range(1, tabpagenr('$'))
     let winnr = 1
     for bufnr in tabpagebuflist(tabnr)
-      let wininfo[join([tabnr, bufnr, winnr], "\t")] = 1
+      call add(pairs, [tabnr, bufnr, winnr])
       let winnr += 1
     endfor
+  endfor
+  let wininfo = {}
+  let base = len(a:chars)
+  let digit = len(pairs) <=# 1 ? 1 : float2nr(floor(log(len(pairs) - 1) / log(base) + 1))
+  for i in range(len(pairs))
+    let id = ''
+    let n = i
+    for _ in range(digit)
+      let id = a:chars[n % base] . id
+      let n = n / base
+    endfor
+    let [tabnr, bufnr, winnr] = pairs[i]
+    let key = join([id, tabnr, bufnr, winnr], "\t")
+    let wininfo[key] = 1
   endfor
   return wininfo
 endfunction
@@ -153,16 +182,18 @@ function! s:find_window(wininfo, conditions) abort
 endfunction
 
 function! s:search_windows(wininfo, conditions) abort
-  let re = '^' . get(a:conditions, 'tabnr', '[^\t]\+')
+  let re = '^' . get(a:conditions, 'id', '[^\t]\+')
+  \     . '\t' . get(a:conditions, 'tabnr', '[^\t]\+')
   \     . '\t' . get(a:conditions, 'bufnr', '[^\t]\+')
   \     . '\t' . get(a:conditions, 'winnr', '[^\t]\+')
   \     . '$'
   let keys = filter(keys(a:wininfo), {_,key -> key =~# re})
   " Convert window strings to dictionary
   let wins = map(map(keys, {_,k -> split(k, '\t')}), {_,items -> {
-  \ 'tabnr': items[0] + 0,
-  \ 'bufnr': items[1] + 0,
-  \ 'winnr': items[2] + 0,
+  \ 'id': items[0],
+  \ 'tabnr': items[1] + 0,
+  \ 'bufnr': items[2] + 0,
+  \ 'winnr': items[3] + 0,
   \}})
   return type(get(a:conditions, 'order_by')) ==# v:t_func ?
   \         sort(wins, a:conditions.order_by) : wins
