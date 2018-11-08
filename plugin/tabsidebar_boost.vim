@@ -16,7 +16,7 @@ endif
 if get(g:, 'tabsidebar_boost#auto_adjust_tabsidebarcolumns', 0)
   augroup tabsidebar_boost
     autocmd!
-    autocmd WinEnter,WinLeave,TabEnter,TabLeave,BufWinEnter,BufWinLeave,BufAdd,BufFilePost *
+    autocmd WinEnter,WinLeave,TabEnter,TabLeave,BufWinEnter,BufWinLeave,BufAdd,BufFilePost,TextChanged,TextChangedI *
     \       let &tabsidebarcolumns = tabsidebar_boost#get_max_column()
   augroup END
 endif
