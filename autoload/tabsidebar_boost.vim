@@ -76,22 +76,14 @@ function! tabsidebar_boost#jump() abort
 endfunction
 
 function! tabsidebar_boost#next_window() abort
-  if !has('tabsidebar')
-    return
-  endif
-  let [wins, curidx] = s:get_windows_with_index()
-  if curidx ==# -1
-    throw 'tabsidebar-boost: could not find current window'
-  endif
-  if curidx + 1 >= len(wins)
-    let win = wins[0]
-  else
-    let win = wins[curidx + 1]
-  endif
-  call win_gotoid(win_getid(win.winnr, win.tabnr))
+  return s:next_window(v:count1)
 endfunction
 
 function! tabsidebar_boost#previous_window() abort
+  return s:next_window(-v:count1)
+endfunction
+
+function! s:next_window(n) abort
   if !has('tabsidebar')
     return
   endif
@@ -99,11 +91,7 @@ function! tabsidebar_boost#previous_window() abort
   if curidx ==# -1
     throw 'tabsidebar-boost: could not find current window'
   endif
-  if curidx - 1 < 0
-    let win = wins[len(wins) - 1]
-  else
-    let win = wins[curidx - 1]
-  endif
+  let win = wins[(curidx + a:n) % len(wins)]
   call win_gotoid(win_getid(win.winnr, win.tabnr))
 endfunction
 
