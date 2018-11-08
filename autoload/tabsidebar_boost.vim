@@ -2,6 +2,22 @@ scriptencoding utf-8
 let s:save_cpo = &cpo
 set cpo&vim
 
+function! s:get_chars(default) abort
+  if type(get(g:, 'tabsidebar_boost#chars')) !=# v:t_string
+    return a:default
+  endif
+  if stridx(g:tabsidebar_boost#chars, "\t") !=# -1
+    echohl ErrorMsg
+    echomsg 'tabsidebar-boost: g:tabsidebar_boost#chars cannot contain tab character.'
+    \       'using default value...'
+    echohl None
+    return a:default
+  endif
+  return g:tabsidebar_boost#chars
+endfunction
+
+let g:tabsidebar_boost#chars = s:get_chars('asdfghjklzxcvbnmqwertyuiop')
+
 
 function! tabsidebar_boost#tabsidebar(tabnr) abort
   if !has('tabsidebar')
