@@ -1,5 +1,8 @@
 
 function! tabsidebar_boost#tabsidebar(tabnr) abort
+  if !has('tabsidebar')
+    return ''
+  endif
   let wininfo = s:assign_ids_to_windows(g:tabsidebar_boost#chars)
   let wins = map(tabpagebuflist(a:tabnr), {winidx,bufnr ->
   \ printf('  %s %s) %s',
@@ -11,6 +14,9 @@ function! tabsidebar_boost#tabsidebar(tabnr) abort
 endfunction
 
 function! tabsidebar_boost#jump() abort
+  if !has('tabsidebar')
+    return
+  endif
   let wininfo = s:assign_ids_to_windows(g:tabsidebar_boost#chars)
   let wins = s:search_windows(wininfo, {})
   let buf = ''
@@ -33,6 +39,9 @@ function! tabsidebar_boost#jump() abort
 endfunction
 
 function! tabsidebar_boost#next_window() abort
+  if !has('tabsidebar')
+    return
+  endif
   let [wins, curidx] = s:get_windows_with_index(g:tabsidebar_boost#chars)
   if curidx ==# -1
     throw 'tabsidebar-boost: could not find current window'
@@ -46,6 +55,9 @@ function! tabsidebar_boost#next_window() abort
 endfunction
 
 function! tabsidebar_boost#prev_window() abort
+  if !has('tabsidebar')
+    return
+  endif
   let [wins, curidx] = s:get_windows_with_index(g:tabsidebar_boost#chars)
   if curidx ==# -1
     throw 'tabsidebar-boost: could not find current window'
