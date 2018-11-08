@@ -33,14 +33,14 @@ function! tabsidebar_boost#tabsidebar(tabnr) abort
   return call(g:tabsidebar_boost#format_tabpage, [a:tabnr, winlines])
 endfunction
 
-function! tabsidebar_boost#adjust_columns() abort
+function! tabsidebar_boost#get_max_column() abort
   let maxcol = 0
   for tabnr in range(1, tabpagenr('$'))
     for line in split(tabsidebar_boost#tabsidebar(tabnr), '\n')
       let maxcol = max([len(line), maxcol])
     endfor
   endfor
-  let &tabsidebarcolumns = maxcol
+  return maxcol
 endfunction
 
 function! tabsidebar_boost#jump() abort
