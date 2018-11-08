@@ -8,8 +8,12 @@ let g:tabsidebar_boost#format_tabpage = get(g:, 'tabsidebar_boost#format_tabpage
 
 function! tabsidebar_boost#format_window(win) abort
   let active = a:win.tabnr ==# tabpagenr() && a:win.winnr ==# winnr() ? '*' : ' '
+  let modified = getbufvar(a:win.bufnr, '&modified') ? ['+'] : []
+  let readonly = getbufvar(a:win.bufnr, '&readonly') ? ['RO'] : []
+  let flags = modified + readonly
+  let flags_status = empty(flags) ? '' : ' [' . join(flags, ',') . ']'
   let name = empty(bufname(a:win.bufnr)) ? '[No Name]' : fnamemodify(bufname(a:win.bufnr), ':t')
-  return printf('  %s %s) %s', active, a:win.id, name)
+  return printf(' %s%s (%s) %s', active, flags_status, a:win.bufnr, name)
 endfunction
 
 function! tabsidebar_boost#format_tabpage(tabnr, winlines) abort
