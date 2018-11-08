@@ -21,8 +21,8 @@ function! tabsidebar_boost#jump() abort
   let wins = s:search_windows(wininfo, {})
   let buf = ''
   " Input characters until matching exactly or failing to match.
-  echon 'Input window character(s): '
   while 1
+    echon "\rInput window character(s): " . buf
     let buf .= s:getchar()
     if empty(filter(copy(wins), {_,w -> w.id !=# buf && w.id =~# '^' . buf }))
       break
