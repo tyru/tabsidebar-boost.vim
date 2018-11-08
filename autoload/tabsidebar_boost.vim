@@ -83,10 +83,9 @@ function! tabsidebar_boost#jump() abort
       echon "\rInput window character(s): " . buf
       let c = s:getchar()
       if c ==# "\<Esc>"
+        redraw
+        echo ''
         return
-      endif
-      if c ==# "\<CR>"
-        break
       endif
       let buf .= c
       if empty(filter(copy(wins), {_,w -> w.char_id() !=# buf && w.char_id() =~# '^' . buf }))
