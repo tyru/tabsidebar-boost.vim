@@ -52,7 +52,14 @@ function! tabsidebar_boost#jump() abort
   try
     while 1
       echon "\rInput window character(s): " . buf
-      let buf .= s:getchar()
+      let c = s:getchar()
+      if c ==# "\<Esc>"
+        return
+      endif
+      if c ==# "\<CR>"
+        break
+      endif
+      let buf .= c
       if empty(filter(copy(wins), {_,w -> w.bufnr !=# buf && w.bufnr =~# '^' . buf }))
         break
       endif
