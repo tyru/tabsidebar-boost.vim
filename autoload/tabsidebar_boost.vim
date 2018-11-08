@@ -72,9 +72,12 @@ function! tabsidebar_boost#jump() abort
   let wins = s:search_windows(wininfo, {})
   let buf = ''
   let s:is_jumping = 1
-  redraw
   " Input characters until matching exactly or failing to match.
   try
+    if get(g:, 'tabsidebar_boost#auto_adjust_tabsidebarcolumns')
+      let &tabsidebarcolumns = tabsidebar_boost#get_max_column()
+    endif
+    redraw
     while 1
       echon "\rInput window character(s): " . buf
       let c = s:getchar()
