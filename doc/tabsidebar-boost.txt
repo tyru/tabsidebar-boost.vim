@@ -1,0 +1,184 @@
+*tabsidebar-boost.txt* add extra features to Vim-TabSideBar
+
+Author:
+  tyru <tyru.exe@gmail.com>
+Version: 1.0
+License:
+NEW BSD LICENSE {{{
+  Copyright (c) 2018, tyru
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+      * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+      * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+      * Neither the name of the tyru nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+}}}
+
+==============================================================================
+CONTENTS								*tabsidebar-boost-contents*
+
+Introduction					|tabsidebar-boost-introduction|
+Interface							|tabsidebar-boost-interface|
+  Keymappings					|tabsidebar-boost-keymappings|
+  Variables						|tabsidebar-boost-variables|
+  Functions						|tabsidebar-boost-keymappings|
+TODO									|tabsidebar-boost-todo|
+Changelog							|tabsidebar-boost-changelog|
+
+
+==============================================================================
+INTRODUCTION							*tabsidebar-boost-introduction* {{{
+
+*tabsidebar-boost* adds extra features to Vim-TabSideBar.
+(see https://rbtnn.github.io/vim/ for Vim-TabSideBar patch)
+>
+	if has('tabsidebar')
+		" Jumps to a window quickly
+		nmap <Space><Space>  <Plug>(tabsidebar-boost-jump)
+		nmap <C-n>           <Plug>(tabsidebar-boost-next-window)
+		nmap <C-p>           <Plug>(tabsidebar-boost-previous-window)
+
+		" Adjust columns of tabsidebar automatically
+		let g:tabsidebar_boost#auto_adjust_tabsidebarcolumns = 1
+
+		" Cool tabsidebar display
+		let &g:tabsidebar = '%!tabsidebar_boost#tabsidebar(g:actual_curtabpage)'
+	endif
+<
+}}}
+==============================================================================
+INTERFACE									*tabsidebar-boost-interface* {{{
+------------------------------------------------------------------------------
+KEYMAPPINGS									*tabsidebar-boost-keymappings* {{{
+
+											*<Plug>(tabsidebar-boost-jump)*
+(n) *<Plug>(tabsidebar-boost-jump)*
+	It prompts buffer number, and if a user types a complete buffer number or
+	typing <Enter>, it jumps to the buffer of given buffer number.
+
+	e.g.:
+	* When only buffer 1 exists, if you type "1", it jumps to buffer 1.
+	* When buffer 1 and 12 exist, if you type "1<CR>", it jumps to buffer 1.
+	  Or if you type "12", it jumps to buffer 12.
+
+									*<Plug>(tabsidebar-boost-next-window)*
+(n) *<Plug>(tabsidebar-boost-next-window)*
+	It jumps to the next window across tabpage.
+	This mapping also supports |[count]|.
+
+								*<Plug>(tabsidebar-boost-previous-window)*
+(n) *<Plug>(tabsidebar-boost-previous-window)*
+	It jumps to the previous window across tabpage.
+	This mapping also supports |[count]|.
+
+}}}
+------------------------------------------------------------------------------
+VARIABLES									*tabsidebar-boost-variables* {{{
+
+							*g:tabsidebar_boost#auto_adjust_tabsidebarcolumns*
+g:tabsidebar_boost#auto_adjust_tabsidebarcolumns
+								(Default: 0)
+	When it is non-zero value, adjust |'tabsidebarcolumns'| to fit to a max column of
+	the tabsidebar line if tabsidebar was changed.
+
+										*g:tabsidebar_boost#format_window*
+g:tabsidebar_boost#format_window
+								(Default: "tabsidebar_boost#format_window")
+	The function name which returns a string that indicates
+	window information.
+	See |tabsidebar_boost#format_window()| for the parameters.
+
+	Example: >
+	let g:tabsidebar_boost#format_window = 'TSBBoostFormatWindow'
+
+	function! TSBBoostFormatWindow(win) abort
+		let active = a:win.tabnr ==# tabpagenr() && a:win.winnr ==# winnr() ? '*' : ' '
+		let modified = getbufvar(a:win.bufnr, '&modified') ? ['+'] : []
+		let readonly = getbufvar(a:win.bufnr, '&readonly') ? ['RO'] : []
+		let help = getbufvar(a:win.bufnr, '&buftype') ==# 'help' ? ['HLP'] : []
+		let preview = getbufvar(a:win.bufnr, '&previewwindow') ? ['PRV'] : []
+		let flags = modified + readonly + help + preview
+		let flags_status = empty(flags) ? '' : ' [' . join(flags, ',') . ']'
+		let id = a:win.bufnr
+		let name = empty(bufname(a:win.bufnr)) ? '[No Name]' : fnamemodify(bufname(a:win.bufnr), ':t')
+		return printf(' %s%s (%s) %s', active, flags_status, id, name)
+	endfunction
+<
+										*g:tabsidebar_boost#format_tabpage*
+g:tabsidebar_boost#format_tabpage
+								(Default: "tabsidebar_boost#format_tabpage")
+	The function name which returns a string that indicates
+	tabpage and its windows information.
+	See |tabsidebar_boost#format_tabpage()| for the parameters.
+
+}}}
+------------------------------------------------------------------------------
+FUNCTIONS									*tabsidebar-boost-functions* {{{
+
+										*tabsidebar_boost#tabsidebar()*
+tabsidebar_boost#tabsidebar({tabnr})
+	{tabnr} is a tab page number.
+	It returns a string for |'tabsidebar'|. A user can use it like this: >
+
+	let &g:tabsidebar = '%!tabsidebar_boost#tabsidebar(g:actual_curtabpage)'
+<
+										*tabsidebar_boost#get_max_column()*
+tabsidebar_boost#get_max_column()
+	It returns a max column number for |'tabsidebarcolumns'|.
+	If you set non-zero to |g:tabsidebar_boost#auto_adjust_tabsidebarcolumns|,
+	this function is used for the calculation.
+	Or you can call this explicitly to update |'tabsidebarcolumns'|: >
+
+	let &tabsidebarcolumns = tabsidebar_boost#get_max_column()
+<
+										*tabsidebar_boost#format_window()*
+tabsidebar_boost#format_window({window})
+	{window} is a Dictionary like this:
+
+	key			value ~
+	tabnr		tab page number
+	winnr		window number
+	bufnr		buffer number
+
+	It returns a string that indicates window information.
+
+										*tabsidebar_boost#format_tabpage()*
+tabsidebar_boost#format_tabpage({tabnr}, {winlines})
+	{tabnr} is a tab page number.
+	{winlines} is a List which has string elements returned by
+	|tabsidebar_boost#format_window()|.
+	It returns a string that indicates window information.
+	If the string contains newline(s), it is displayed as two or more lines
+	in tabsidebar.
+
+										*tabsidebar_boost#jump()*
+tabsidebar_boost#jump()
+	The function version of |<Plug>(tabsidebar-boost-jump)|.
+
+										*tabsidebar_boost#next_window()*
+tabsidebar_boost#next_window()
+	The function version of |<Plug>(tabsidebar-boost-next-window)|.
+
+										*tabsidebar_boost#previous_window()*
+tabsidebar_boost#previous_window()
+	The function version of |<Plug>(tabsidebar-boost-previous-window)|.
+
+}}}
+==============================================================================
+TODO											*tabsidebar-boost-todo* {{{
+
+See https://github.com/tyru/tabsidebar-boost.vim/issues
+
+}}}
+==============================================================================
+CHANGELOG									*tabsidebar-boost-changelog* {{{
+
+1.0:
+- Initial upload.
+
+}}}
+==============================================================================
+vim:tw=78:fo=tcq2mM:ts=4:ft=help:norl:noet:fdm=marker:fen
