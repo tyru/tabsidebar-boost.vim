@@ -1,3 +1,7 @@
+scriptencoding utf-8
+let s:save_cpo = &cpo
+set cpo&vim
+
 
 function! tabsidebar_boost#tabsidebar(tabnr) abort
   if !has('tabsidebar')
@@ -146,3 +150,5 @@ function! s:search_windows(wininfo, conditions) abort
   return type(get(a:conditions, 'order_by')) ==# v:t_func ?
   \         sort(wins, a:conditions.order_by) : wins
 endfunction
+
+let &cpo = s:save_cpo
