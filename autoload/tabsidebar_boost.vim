@@ -33,12 +33,6 @@ function! tabsidebar_boost#tabsidebar(tabnr) abort
   return call(g:tabsidebar_boost#format_tabpage, [a:tabnr, winlines])
 endfunction
 
-function! tabsidebar_boost#is_jumping() abort
-  return s:is_jumping
-endfunction
-
-let s:is_jumping = 0
-
 function! tabsidebar_boost#jump() abort
   if !has('tabsidebar')
     return
@@ -46,27 +40,21 @@ function! tabsidebar_boost#jump() abort
   let wininfo = s:get_wininfo()
   let wins = s:search_windows(wininfo, {})
   let buf = ''
-  let s:is_jumping = 1
-  redraw
   " Input characters until matching exactly or failing to match.
-  try
-    while 1
-      echon "\rInput window character(s): " . buf
-      let c = s:getchar()
-      if c ==# "\<Esc>"
-        return
-      endif
-      if c ==# "\<CR>"
-        break
-      endif
-      let buf .= c
-      if empty(filter(copy(wins), {_,w -> w.bufnr !=# buf && w.bufnr =~# '^' . buf }))
-        break
-      endif
-    endwhile
-  finally
-    let s:is_jumping = 0
-  endtry
+  while 1
+    echon "\rInput window character(s): " . buf
+    let c = s:getchar()
+    if c ==# "\<Esc>"
+      return
+    endif
+    if c ==# "\<CR>"
+      break
+    endif
+    let buf .= c
+    if empty(filter(copy(wins), {_,w -> w.bufnr !=# buf && w.bufnr =~# '^' . buf }))
+      break
+    endif
+  endwhile
   let win = get(filter(copy(wins), {_,w -> w.bufnr ==# buf }), 0, {})
   if empty(win)
     echohl WarningMsg
