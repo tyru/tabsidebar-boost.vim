@@ -18,7 +18,21 @@ nnoremap <silent> <Plug>(tabsidebar-boost-jump)            :<C-u>call tabsidebar
 nnoremap <silent> <Plug>(tabsidebar-boost-next-window)     :<C-u>call tabsidebar_boost#next_window()<CR>
 nnoremap <silent> <Plug>(tabsidebar-boost-previous-window) :<C-u>call tabsidebar_boost#prev_window()<CR>
 
-let g:tabsidebar_boost#chars = 'asdfghjklzxcvbnmqwertyuiop'
+function! s:get_chars(default) abort
+  if type(get(g:, 'tabsidebar_boost#chars')) !=# v:t_string
+    return a:default
+  endif
+  if stridx(g:tabsidebar_boost#chars, "\t") !=# -1
+    echohl ErrorMsg
+    echomsg 'tabsidebar-boost: g:tabsidebar_boost#chars cannot contain tab character.'
+    \       'using default value...'
+    echohl None
+    return a:default
+  endif
+  return g:tabsidebar_boost#chars
+endfunction
+
+let g:tabsidebar_boost#chars = s:get_chars('asdfghjklzxcvbnmqwertyuiop')
 
 
 let &cpo = s:save_cpo
