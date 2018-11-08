@@ -91,7 +91,7 @@ function! tabsidebar_boost#next_window() abort
   call win_gotoid(win_getid(win.winnr, win.tabnr))
 endfunction
 
-function! tabsidebar_boost#prev_window() abort
+function! tabsidebar_boost#previous_window() abort
   if !has('tabsidebar')
     return
   endif
