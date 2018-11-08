@@ -43,6 +43,12 @@ function! tabsidebar_boost#get_max_column() abort
   return maxcol
 endfunction
 
+function! tabsidebar_boost#is_jumping() abort
+  return s:is_jumping
+endfunction
+
+let s:is_jumping = 0
+
 function! tabsidebar_boost#jump() abort
   if !has('tabsidebar')
     return
@@ -50,21 +56,27 @@ function! tabsidebar_boost#jump() abort
   let wininfo = s:get_wininfo()
   let wins = s:search_windows(wininfo, {})
   let buf = ''
+  let s:is_jumping = 1
+  redraw
   " Input characters until matching exactly or failing to match.
-  while 1
-    echon "\rInput window character(s): " . buf
-    let c = s:getchar()
-    if c ==# "\<Esc>"
-      return
-    endif
-    if c ==# "\<CR>"
-      break
-    endif
-    let buf .= c
-    if empty(filter(copy(wins), {_,w -> w.bufnr !=# buf && w.bufnr =~# '^' . buf }))
-      break
-    endif
-  endwhile
+  try
+    while 1
+      echon "\rInput window character(s): " . buf
+      let c = s:getchar()
+      if c ==# "\<Esc>"
+        return
+      endif
+      if c ==# "\<CR>"
+        break
+      endif
+      let buf .= c
+      if empty(filter(copy(wins), {_,w -> w.bufnr !=# buf && w.bufnr =~# '^' . buf }))
+        break
+      endif
+    endwhile
+  finally
+    let s:is_jumping = 0
+  endtry
   let win = get(filter(copy(wins), {_,w -> w.bufnr ==# buf }), 0, {})
   if empty(win)
     echohl WarningMsg
