@@ -17,21 +17,38 @@ function! s:get_chars(default) abort
 endfunction
 
 let g:tabsidebar_boost#chars = s:get_chars('asdfghjklzxcvbnmqwertyuiop')
+let g:tabsidebar_boost#format_window = get(g:, 'tabsidebar_boost#format_window', 'tabsidebar_boost#format_window')
+let g:tabsidebar_boost#format_tabpage = get(g:, 'tabsidebar_boost#format_tabpage', 'tabsidebar_boost#format_tabpage')
 
+
+function! tabsidebar_boost#format_window(win) abort
+  let active = a:win.tabnr ==# tabpagenr() && a:win.winnr ==# winnr() ? '*' : ' '
+  let name = empty(bufname(a:win.bufnr)) ? '[No Name]' : fnamemodify(bufname(a:win.bufnr), ':t')
+  return printf('  %s %s) %s', active, a:win.id, name)
+endfunction
+
+function! tabsidebar_boost#format_tabpage(tabnr, winlines) abort
+  return join([a:tabnr] + a:winlines, "\n")
+endfunction
 
 function! tabsidebar_boost#tabsidebar(tabnr) abort
   if !has('tabsidebar')
     return ''
   endif
   let wininfo = s:assign_ids_to_windows(g:tabsidebar_boost#chars)
-  let wins = map(tabpagebuflist(a:tabnr), {winidx,bufnr ->
-  \ printf('  %s %s) %s',
-  \ a:tabnr ==# tabpagenr() && winidx ==# winnr() - 1 ? '*' : ' ',
-  \ s:find_window(wininfo, {'tabnr': a:tabnr, 'winnr': winidx + 1}).id,
-  \ empty(bufname(bufnr)) ? '[No Name]' : fnamemodify(bufname(bufnr), ':t'))
+  let winlines = map(tabpagebuflist(a:tabnr), {winidx,bufnr ->
+  \ call(g:tabsidebar_boost#format_window, [
+  \   s:find_window(wininfo, {'tabnr': a:tabnr, 'winnr': winidx + 1})
+  \ ])
   \})
-  return join([a:tabnr] + wins, "\n")
+  return call(g:tabsidebar_boost#format_tabpage, [a:tabnr, winlines])
 endfunction
+
+function! tabsidebar_boost#is_jumping() abort
+  return s:is_jumping
+endfunction
+
+let s:is_jumping = 0
 
 function! tabsidebar_boost#jump() abort
   if !has('tabsidebar')
@@ -40,14 +57,20 @@ function! tabsidebar_boost#jump() abort
   let wininfo = s:assign_ids_to_windows(g:tabsidebar_boost#chars)
   let wins = s:search_windows(wininfo, {})
   let buf = ''
+  let s:is_jumping = 1
+  redraw
   " Input characters until matching exactly or failing to match.
-  while 1
-    echon "\rInput window character(s): " . buf
-    let buf .= s:getchar()
-    if empty(filter(copy(wins), {_,w -> w.id !=# buf && w.id =~# '^' . buf }))
-      break
-    endif
-  endwhile
+  try
+    while 1
+      echon "\rInput window character(s): " . buf
+      let buf .= s:getchar()
+      if empty(filter(copy(wins), {_,w -> w.id !=# buf && w.id =~# '^' . buf }))
+        break
+      endif
+    endwhile
+  finally
+    let s:is_jumping = 0
+  endtry
   let win = get(filter(copy(wins), {_,w -> w.id ==# buf }), 0, {})
   if empty(win)
     echohl WarningMsg
