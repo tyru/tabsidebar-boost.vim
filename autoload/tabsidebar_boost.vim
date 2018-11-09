@@ -2,6 +2,12 @@ scriptencoding utf-8
 let s:save_cpo = &cpo
 set cpo&vim
 
+let s:has_tabsidebar = has('tabsidebar')
+
+function! s:enabled() abort
+  return s:has_tabsidebar && &showtabsidebar !=# 0
+endfunction
+
 function! s:get_chars(default) abort
   if type(get(g:, 'tabsidebar_boost#chars')) !=# v:t_string
     return a:default
@@ -37,7 +43,7 @@ function! tabsidebar_boost#format_tabpage(tabnr, winlines) abort
 endfunction
 
 function! tabsidebar_boost#tabsidebar(tabnr) abort
-  if !has('tabsidebar')
+  if !s:enabled()
     return ''
   endif
   let wininfo = s:get_wininfo(g:tabsidebar_boost#chars)
@@ -50,7 +56,7 @@ function! tabsidebar_boost#tabsidebar(tabnr) abort
 endfunction
 
 function! tabsidebar_boost#adjust_column() abort
-  if !has('tabsidebar')
+  if !s:enabled()
     return ''
   endif
   let &tabsidebarcolumns = tabsidebar_boost#get_max_column()
@@ -73,7 +79,7 @@ endfunction
 let s:is_jumping = 0
 
 function! tabsidebar_boost#jump() abort
-  if !has('tabsidebar')
+  if !s:enabled()
     return
   endif
   let wininfo = s:get_wininfo(g:tabsidebar_boost#chars)
@@ -121,7 +127,7 @@ function! tabsidebar_boost#previous_window() abort
 endfunction
 
 function! s:next_window(n, chars) abort
-  if !has('tabsidebar')
+  if !s:enabled()
     return
   endif
   let [wins, curidx] = s:get_windows_with_index(a:chars)
