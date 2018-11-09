@@ -159,6 +159,15 @@ tabsidebar_boost#get_max_column()
 
 	let &tabsidebarcolumns = tabsidebar_boost#get_max_column()
 <
+	But you can simply use |tabsidebar_boost#adjust_column()| function for the
+	above case.
+
+										*tabsidebar_boost#adjust_column()*
+tabsidebar_boost#adjust_column()
+	This updates |'tabsidebarcolumns'| value. This is registered and called when
+	|g:tabsidebar_boost#auto_adjust_tabsidebarcolumns| is non-zero.
+	Also you can call this explicitly.
+
 										*tabsidebar_boost#format_window()*
 tabsidebar_boost#format_window({window})
 	This returns a string that indicates window information.

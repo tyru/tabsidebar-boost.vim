@@ -49,6 +49,13 @@ function! tabsidebar_boost#tabsidebar(tabnr) abort
   return call(g:tabsidebar_boost#format_tabpage, [a:tabnr, winlines])
 endfunction
 
+function! tabsidebar_boost#adjust_column() abort
+  if !has('tabsidebar')
+    return ''
+  endif
+  let &tabsidebarcolumns = tabsidebar_boost#get_max_column()
+endfunction
+
 function! tabsidebar_boost#get_max_column() abort
   let maxcol = 0
   for tabnr in range(1, tabpagenr('$'))
