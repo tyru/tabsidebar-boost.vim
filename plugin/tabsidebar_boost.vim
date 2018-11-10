@@ -25,6 +25,7 @@ if get(g:, 'tabsidebar_boost#auto_adjust_tabsidebarcolumns', 0)
     \ 'BufWinLeave',
     \ 'BufAdd',
     \ 'BufFilePost',
+    \ 'BufWritePost',
     \ 'TextChanged',
     \ 'TextChangedI',
     \]
