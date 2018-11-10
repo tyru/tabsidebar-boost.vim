@@ -16,8 +16,20 @@ endif
 if get(g:, 'tabsidebar_boost#auto_adjust_tabsidebarcolumns', 0)
   augroup tabsidebar_boost
     autocmd!
-    autocmd WinEnter,WinLeave,TabEnter,TabLeave,BufWinEnter,BufWinLeave,BufAdd,BufFilePost,TextChanged,TextChangedI *
-    \       call tabsidebar_boost#adjust_column()
+    for event in [
+    \ 'WinEnter',
+    \ 'WinLeave',
+    \ 'TabEnter',
+    \ 'TabLeave',
+    \ 'BufWinEnter',
+    \ 'BufWinLeave',
+    \ 'BufAdd',
+    \ 'BufFilePost',
+    \ 'TextChanged',
+    \ 'TextChangedI',
+    \]
+      execute 'autocmd' event '* call tabsidebar_boost#adjust_column()'
+    endfor
   augroup END
 endif
 
