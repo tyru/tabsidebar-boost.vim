@@ -120,16 +120,16 @@ g:tabsidebar_boost#format_window
 	let g:tabsidebar_boost#format_window = 'TSBBoostFormatWindow'
 
 	function! TSBBoostFormatWindow(win) abort
-		let active = a:win.tabnr ==# tabpagenr() && a:win.winnr ==# winnr() ? '*' : ' '
+		let active = a:win.tabnr ==# tabpagenr() && a:win.winnr ==# winnr() ? '>' : ' '
+		let id = tabsidebar_boost#is_jumping() ? printf(' (%s)', a:win.char_id()) : ''
 		let modified = getbufvar(a:win.bufnr, '&modified') ? ['+'] : []
 		let readonly = getbufvar(a:win.bufnr, '&readonly') ? ['RO'] : []
 		let help = getbufvar(a:win.bufnr, '&buftype') ==# 'help' ? ['HLP'] : []
-		let preview = getbufvar(a:win.bufnr, '&previewwindow') ? ['PRV'] : []
+		let preview = getwinvar(a:win.winnr, '&previewwindow') ? ['PRV'] : []
 		let flags = modified + readonly + help + preview
 		let flags_status = empty(flags) ? '' : ' [' . join(flags, ',') . ']'
-		let id = tabsidebar_boost#is_jumping() ? a:win.char_id() : a:win.bufnr
-		let name = empty(bufname(a:win.bufnr)) ? '[No Name]' : fnamemodify(bufname(a:win.bufnr), ':t')
-		return printf(' %s%s (%s) %s', active, flags_status, id, name)
+		let name = empty(bufname(a:win.bufnr)) ? printf('Buffer #%d', a:win.bufnr) : fnamemodify(bufname(a:win.bufnr), ':t')
+		return printf(' %s%s %s%s', active, id, name, flags_status)
 	endfunction
 <
 										*g:tabsidebar_boost#format_tabpage*
