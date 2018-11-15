@@ -23,6 +23,7 @@ if get(g:, 'tabsidebar_boost#auto_adjust_tabsidebarcolumns', 0)
     \ 'TabLeave',
     \ 'BufWinEnter',
     \ 'BufWinLeave',
+    \ 'TerminalOpen',
     \ 'BufAdd',
     \ 'BufFilePost',
     \ 'BufWritePost',
