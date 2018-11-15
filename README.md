@@ -17,6 +17,9 @@ if has('tabsidebar')
 	nmap <C-n>           <Plug>(tabsidebar-boost-next-window)
 	nmap <C-p>           <Plug>(tabsidebar-boost-previous-window)
 
+	" You can change tab page title
+	nnoremap <Space>t    :<C-u>TabSideBarBoostSetTitle<Space><C-r>=get(t:, 'tabsidebar_boost_title', '')<CR>
+
 	" Adjust columns of tabsidebar automatically
 	let g:tabsidebar_boost#auto_adjust_tabsidebarcolumns = 1
 
