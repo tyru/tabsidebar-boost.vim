@@ -47,6 +47,11 @@ function! tabsidebar_boost#format_tabpage(tabnr, winlines) abort
   return join([title] + a:winlines, "\n")
 endfunction
 
+function! tabsidebar_boost#set_tab_title(title) abort
+  let t:tabsidebar_boost_title = a:title
+  call tabsidebar_boost#adjust_column()
+endfunction
+
 function! tabsidebar_boost#tabsidebar(tabnr) abort
   if !s:enabled()
     return ''
