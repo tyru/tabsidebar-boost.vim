@@ -138,6 +138,17 @@ g:tabsidebar_boost#format_tabpage
 	The function name which returns a string that indicates
 	tabpage and its windows information.
 	See |tabsidebar_boost#format_tabpage()| for the parameters.
+	See |t:tabsidebar_boost_title| for tab page title.
+
+							*t:tabsidebar_boost_title*
+t:tabsidebar_boost_title
+	The tab page title.
+	If this variable does not exist or empty,
+	The default tab title ("Tab #1" for tab 1) is used.
+
+	NOTE: This string value is used only when
+	|g:tabsidebar_boost#format_tabpage| variable specifies the default
+	function |tabsidebar_boost#format_tabpage()|.
 
 }}}
 ------------------------------------------------------------------------------
@@ -189,6 +200,10 @@ tabsidebar_boost#format_tabpage({tabnr}, {winlines})
 	If the string contains newline(s), it is displayed as two or more lines
 	in tabsidebar.
 
+										*tabsidebar_boost#set_tab_title()*
+tabsidebar_boost#set_tab_title({title})
+	The function version of |:TabSideBarBoostSetTitle|.
+
 										*tabsidebar_boost#is_jumping()*
 tabsidebar_boost#is_jumping()
 	This returns non-zero while firing |tabsidebar_boost#jump()|.
@@ -205,6 +220,15 @@ tabsidebar_boost#next_window()
 tabsidebar_boost#previous_window()
 	The function version of |<Plug>(tabsidebar-boost-previous-window)|.
 
+}}}
+------------------------------------------------------------------------------
+COMMANDS									*tabsidebar-boost-commands* {{{
+
+										*:TabSideBarBoostSetTitle*
+:TabSideBarBoostSetTitle {title}
+	This updates |t:tabsidebar_boost_title| and adjusts |'tabsidebarcolumns'|.
+
+}}}
 }}}
 ==============================================================================
 TODO											*tabsidebar-boost-todo* {{{
