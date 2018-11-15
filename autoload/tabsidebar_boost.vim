@@ -30,7 +30,7 @@ let g:tabsidebar_boost#format_tabpage = get(g:, 'tabsidebar_boost#format_tabpage
 function! tabsidebar_boost#format_window(win) abort
   let active = a:win.tabnr ==# tabpagenr() && a:win.winnr ==# winnr() ? '>' : ' '
   let id = tabsidebar_boost#is_jumping() ? printf(' (%s)', a:win.char_id()) : ''
-  let modified = getbufvar(a:win.bufnr, '&modified') ? ['+'] : []
+  let modified = getbufvar(a:win.bufnr, '&buftype') !=# 'terminal' && getbufvar(a:win.bufnr, '&modified') ? ['+'] : []
   let readonly = getbufvar(a:win.bufnr, '&readonly') ? ['RO'] : []
   let flags = modified + readonly
   let flags_status = empty(flags) ? '' : ' [' . join(flags, ',') . ']'
