@@ -115,9 +115,6 @@ function! tabsidebar_boost#jump() abort
   endtry
   let win = get(filter(copy(wins), {_,w -> w.char_id() ==# buf }), 0, {})
   if empty(win)
-    echohl WarningMsg
-    echomsg 'no such window:' buf
-    echohl None
     return
   endif
   call win_gotoid(win_getid(win.winnr, win.tabnr))
