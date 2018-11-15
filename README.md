@@ -2,6 +2,12 @@
 
 Tabsidebar-Boost adds extra features to [Vim-TabSideBar patch](https://rbtnn.github.io/vim/).
 
+* Adjust tabsidebar width (`tabsidebarcolumns`) automatically
+* Quickly jump to another window
+* Set project title per tab page by `:TabSideBarBoostSetTitle`
+
+![Set project titles](_images/set-title.png)
+
 # Configuration (example)
 
 ```vim
@@ -24,4 +30,4 @@ endif
 
 # Demo
 
-![demo](demo.gif)
+![Demo](_images/demo.gif)
