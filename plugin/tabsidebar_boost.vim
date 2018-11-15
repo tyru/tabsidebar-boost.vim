@@ -38,5 +38,8 @@ nnoremap <silent> <Plug>(tabsidebar-boost-jump)            :<C-u>call tabsidebar
 nnoremap <silent> <Plug>(tabsidebar-boost-next-window)     :<C-u>call tabsidebar_boost#next_window()<CR>
 nnoremap <silent> <Plug>(tabsidebar-boost-previous-window) :<C-u>call tabsidebar_boost#previous_window()<CR>
 
+command! -bar -nargs=* TabSideBarBoostSetTitle
+\         let t:tabsidebar_boost_title = <q-args>
+
 
 let &cpo = s:save_cpo
