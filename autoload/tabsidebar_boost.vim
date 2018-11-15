@@ -39,7 +39,12 @@ function! tabsidebar_boost#format_window(win) abort
 endfunction
 
 function! tabsidebar_boost#format_tabpage(tabnr, winlines) abort
-  return join([a:tabnr] + a:winlines, "\n")
+  if get(t:, 'tabsidebar_boost_title', '') !=# ''
+    let title = t:tabsidebar_boost_title
+  else
+    let title = printf('Tab #%d', a:tabnr)
+  endif
+  return join([title] + a:winlines, "\n")
 endfunction
 
 function! tabsidebar_boost#tabsidebar(tabnr) abort
