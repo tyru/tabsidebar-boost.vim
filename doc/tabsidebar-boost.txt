@@ -217,6 +217,19 @@ COMMANDS									*tabsidebar-boost-commands* {{{
 	See |tabsidebar-boost-introduction| for useful mapping to invoke this
 	command quickly.
 
+										*:TabSideBarBoostEnable*
+:TabSideBarBoostEnable
+	This enables this plugin.
+
+										*:TabSideBarBoostDisable*
+:TabSideBarBoostDisable
+	This disables this plugin.
+
+										*:TabSideBarBoostToggle*
+:TabSideBarBoostToggle
+	This enables this plugin if disabled.
+	This disables this plugin if enabled.
+
 }}}
 }}}
 ==============================================================================

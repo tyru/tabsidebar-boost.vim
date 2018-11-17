@@ -39,6 +39,12 @@ nnoremap <silent> <Plug>(tabsidebar-boost-jump)            :<C-u>call tabsidebar
 nnoremap <silent> <Plug>(tabsidebar-boost-next-window)     :<C-u>call tabsidebar_boost#next_window()<CR>
 nnoremap <silent> <Plug>(tabsidebar-boost-previous-window) :<C-u>call tabsidebar_boost#previous_window()<CR>
 
+command! -bar TabSideBarBoostEnable
+\         call tabsidebar_boost#enable()
+command! -bar TabSideBarBoostDisable
+\         call tabsidebar_boost#disable()
+command! -bar TabSideBarBoostToggle
+\         call tabsidebar_boost#toggle()
 command! -bar -nargs=* TabSideBarBoostSetTitle
 \         call tabsidebar_boost#set_tab_title(<q-args>)
 

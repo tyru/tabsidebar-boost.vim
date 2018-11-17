@@ -3,9 +3,22 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let s:has_tabsidebar = has('tabsidebar')
+let s:enabled = 1
 
 function! s:enabled() abort
-  return s:has_tabsidebar && &showtabsidebar !=# 0
+  return &showtabsidebar !=# 0 && s:enabled
+endfunction
+
+function! tabsidebar_boost#enable() abort
+  let s:enabled = 1
+endfunction
+
+function! tabsidebar_boost#disable() abort
+  let s:enabled = 0
+endfunction
+
+function! tabsidebar_boost#toggle() abort
+  let s:enabled = !s:enabled
 endfunction
 
 function! s:get_chars(default) abort
@@ -58,18 +71,28 @@ function! tabsidebar_boost#tabsidebar(tabnr) abort
   if !s:enabled()
     return ''
   endif
-  let wininfo = s:get_wininfo(g:tabsidebar_boost#chars)
-  let winlines = map(tabpagebuflist(a:tabnr), {winidx,bufnr ->
-  \ call(g:tabsidebar_boost#format_window, [
-  \   s:find_window(wininfo, {'tabnr': a:tabnr, 'winnr': winidx + 1})
-  \ ])
-  \})
-  return call(g:tabsidebar_boost#format_tabpage, [a:tabnr, winlines])
+  try
+    let wininfo = s:get_wininfo(g:tabsidebar_boost#chars)
+    let winlines = map(tabpagebuflist(a:tabnr), {winidx,bufnr ->
+    \ call(g:tabsidebar_boost#format_window, [
+    \   s:find_window(wininfo, {'tabnr': a:tabnr, 'winnr': winidx + 1})
+    \ ])
+    \})
+    return call(g:tabsidebar_boost#format_tabpage, [a:tabnr, winlines])
+  catch
+    let s:enabled = 0
+    set tabsidebar&
+    echohl ErrorMsg
+    echomsg 'exception =' v:exception
+    echomsg 'throwpoint =' v:throwpoint
+    echomsg 'tabsidebar-boost: error occurred. disabled tabsidebar-boost'
+    echohl None
+  endtry
 endfunction
 
 function! tabsidebar_boost#adjust_column() abort
   if !s:enabled()
-    return ''
+    return
   endif
   let &tabsidebarcolumns = tabsidebar_boost#get_max_column()
 endfunction
@@ -192,7 +215,7 @@ function! s:get_wininfo(chars) abort
 endfunction
 
 function! s:find_window(wininfo, conditions) abort
-  return get(s:search_windows(a:wininfo, a:conditions), 0, {})
+  return s:search_windows(a:wininfo, a:conditions)[0]
 endfunction
 
 function! s:search_windows(wininfo, conditions) abort
