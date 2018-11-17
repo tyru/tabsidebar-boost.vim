@@ -175,8 +175,7 @@ tabsidebar_boost#format_window({window})
 	id			a window ID number which is unique across tab pages
 	char_id		a function which returns a string of window ID
 	tabnr		a tab page number
-	winnr		a window number
-	bufnr		a buffer number
+	winid		a window ID
 
 										*tabsidebar_boost#format_tabpage()*
 tabsidebar_boost#format_tabpage({tabnr}, {winlines})
