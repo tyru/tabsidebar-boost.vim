@@ -2,7 +2,9 @@ scriptencoding utf-8
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:has_tabsidebar = has('tabsidebar')
+if !has('tabsidebar')
+  finish
+endif
 let s:enabled = 1
 
 function! s:enabled() abort
