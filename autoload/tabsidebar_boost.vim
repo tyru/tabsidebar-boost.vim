@@ -41,7 +41,10 @@ let g:tabsidebar_boost#format_tabpage = get(g:, 'tabsidebar_boost#format_tabpage
 
 
 function! tabsidebar_boost#format_window(win) abort
-  let w = getwininfo(win_getid(a:win.winnr))[0]
+  let w = get(getwininfo(win_getid(a:win.winnr, a:win.tabnr)), 0, {})
+  if empty(w)
+    return ''
+  endif
   let active = a:win.tabnr ==# tabpagenr() && a:win.winnr ==# winnr() ? '>' : ' '
   let id = tabsidebar_boost#is_jumping() ? printf(' (%s)', a:win.char_id()) : ''
   let name = w.loclist ? '[Location List]' :
