@@ -5,19 +5,6 @@ set cpo&vim
 if !has('tabsidebar')
   finish
 endif
-let s:enabled = 1
-
-function! tabsidebar_boost#enable() abort
-  let s:enabled = 1
-endfunction
-
-function! tabsidebar_boost#disable() abort
-  let s:enabled = 0
-endfunction
-
-function! tabsidebar_boost#toggle() abort
-  let s:enabled = !s:enabled
-endfunction
 
 function! s:get_chars(default) abort
   if type(get(g:, 'tabsidebar_boost#chars')) !=# v:t_string
@@ -69,9 +56,6 @@ function! tabsidebar_boost#set_tab_title(title) abort
 endfunction
 
 function! tabsidebar_boost#tabsidebar(tabnr) abort
-  if !s:enabled
-    return ''
-  endif
   try
     let wininfo = s:get_wininfo(g:tabsidebar_boost#chars)
     let winlines = map(tabpagebuflist(a:tabnr), {winidx,bufnr ->
@@ -81,21 +65,24 @@ function! tabsidebar_boost#tabsidebar(tabnr) abort
     \})
     return call(g:tabsidebar_boost#format_tabpage, [a:tabnr, winlines])
   catch
-    let s:enabled = 0
+    " Disable tabsidebar-boost display
     set tabsidebar&
-    echohl ErrorMsg
-    echomsg 'exception =' v:exception
-    echomsg 'throwpoint =' v:throwpoint
-    echomsg 'tabsidebar-boost: error occurred. disabled tabsidebar-boost'
-    echohl None
+    let g:tabsidebar_boost#auto_adjust_tabsidebarcolumns = 0
+    throw printf('tabsidebar-boost: error occurred. ' .
+    \            'disabled tabsidebar-boost: %s @ %s',
+    \             v:exception, v:throwpoint)
   endtry
 endfunction
 
 function! tabsidebar_boost#adjust_column() abort
-  if !s:enabled
-    return
+  if get(g:, 'tabsidebar_boost#auto_adjust_tabsidebarcolumns')
+    try
+      let &tabsidebarcolumns = tabsidebar_boost#get_max_column()
+    catch /tabsidebar-boost: error occurred/
+      let g:tabsidebar_boost#auto_adjust_tabsidebarcolumns = 0
+      throw v:exception
+    endtry
   endif
-  let &tabsidebarcolumns = tabsidebar_boost#get_max_column()
 endfunction
 
 function! tabsidebar_boost#get_max_column() abort
@@ -115,9 +102,6 @@ endfunction
 let s:is_jumping = 0
 
 function! tabsidebar_boost#jump() abort
-  if !s:enabled
-    return
-  endif
   let wininfo = s:get_wininfo(g:tabsidebar_boost#chars)
   let wins = s:search_windows(wininfo, {})
   let buf = ''
@@ -160,9 +144,6 @@ function! tabsidebar_boost#previous_window() abort
 endfunction
 
 function! s:next_window(n, chars) abort
-  if !s:enabled
-    return
-  endif
   let [wins, curidx] = s:get_windows_with_index(a:chars)
   if curidx ==# -1
     throw 'tabsidebar-boost: could not find current window'
