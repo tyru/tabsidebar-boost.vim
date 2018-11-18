@@ -7,10 +7,6 @@ if !has('tabsidebar')
 endif
 let s:enabled = 1
 
-function! s:enabled() abort
-  return &showtabsidebar !=# 0 && s:enabled
-endfunction
-
 function! tabsidebar_boost#enable() abort
   let s:enabled = 1
 endfunction
@@ -73,7 +69,7 @@ function! tabsidebar_boost#set_tab_title(title) abort
 endfunction
 
 function! tabsidebar_boost#tabsidebar(tabnr) abort
-  if !s:enabled()
+  if !s:enabled
     return ''
   endif
   try
@@ -96,7 +92,7 @@ function! tabsidebar_boost#tabsidebar(tabnr) abort
 endfunction
 
 function! tabsidebar_boost#adjust_column() abort
-  if !s:enabled()
+  if !s:enabled
     return
   endif
   let &tabsidebarcolumns = tabsidebar_boost#get_max_column()
@@ -119,7 +115,7 @@ endfunction
 let s:is_jumping = 0
 
 function! tabsidebar_boost#jump() abort
-  if !s:enabled()
+  if !s:enabled
     return
   endif
   let wininfo = s:get_wininfo(g:tabsidebar_boost#chars)
@@ -164,7 +160,7 @@ function! tabsidebar_boost#previous_window() abort
 endfunction
 
 function! s:next_window(n, chars) abort
-  if !s:enabled()
+  if !s:enabled
     return
   endif
   let [wins, curidx] = s:get_windows_with_index(a:chars)
