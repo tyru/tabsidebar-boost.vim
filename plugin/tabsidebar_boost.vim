@@ -38,6 +38,8 @@ endif
 nnoremap <silent> <Plug>(tabsidebar-boost-jump)            :<C-u>call tabsidebar_boost#jump()<CR>
 nnoremap <silent> <Plug>(tabsidebar-boost-next-window)     :<C-u>call tabsidebar_boost#next_window()<CR>
 nnoremap <silent> <Plug>(tabsidebar-boost-previous-window) :<C-u>call tabsidebar_boost#previous_window()<CR>
+tnoremap <silent> <Plug>(tabsidebar-boost-next-window)     <C-w>:<C-u>call tabsidebar_boost#next_window()<CR>
+tnoremap <silent> <Plug>(tabsidebar-boost-previous-window) <C-w>:<C-u>call tabsidebar_boost#previous_window()<CR>
 
 command! -bar -nargs=* TabSideBarBoostSetTitle
 \         call tabsidebar_boost#set_tab_title(<q-args>)
