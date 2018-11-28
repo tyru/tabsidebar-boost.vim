@@ -66,11 +66,14 @@ function! tabsidebar_boost#tabsidebar(tabnr) abort
     return call(g:tabsidebar_boost#format_tabpage, [a:tabnr, winlines])
   catch
     " Disable tabsidebar-boost display
+    execute 'command! -bar TabSideBarBoostRestore let [&tabsidebar, g:tabsidebar_boost#auto_adjust_tabsidebarcolumns] = ' . string([&tabsidebar, g:tabsidebar_boost#auto_adjust_tabsidebarcolumns])
     set tabsidebar&
     let g:tabsidebar_boost#auto_adjust_tabsidebarcolumns = 0
-    throw printf('tabsidebar-boost: error occurred. ' .
-    \            'disabled tabsidebar-boost: %s @ %s',
-    \             v:exception, v:throwpoint)
+    echohl ErrorMsg
+    echomsg 'tabsidebar-boost: error occurred. disabled tabsidebar-boost.'
+    echomsg '  ' . v:exception '@' v:throwpoint
+    echomsg 'tabsidebar-boost: please run :TabSideBarBoostRestore to re-enable tabsidebar-boost'
+    echohl None
   endtry
 endfunction
 

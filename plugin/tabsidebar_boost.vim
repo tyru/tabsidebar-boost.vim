@@ -41,6 +41,7 @@ nnoremap <silent> <Plug>(tabsidebar-boost-previous-window) :<C-u>call tabsidebar
 
 command! -bar -nargs=* TabSideBarBoostSetTitle
 \         call tabsidebar_boost#set_tab_title(<q-args>)
+command! -bar TabSideBarBoostRestore :
 
 
 let &cpo = s:save_cpo
